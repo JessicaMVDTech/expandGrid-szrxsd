@@ -7,14 +7,12 @@ import {
   ColumnDirective,
   Page,
   Inject,
+  Edit,
+  Toolbar,
 } from '@syncfusion/ej2-react-grids';
-import {
-  DataManager,
-  ODataAdaptor,
-  Query,
-  WebApiAdaptor,
-  ODataV4Adaptor,
-} from '@syncfusion/ej2-data';
+import { DataManager, ODataV4Adaptor } from '@syncfusion/ej2-data';
+import { createElement, getComponent } from '@syncfusion/ej2-base';
+import { DropDownList } from '@syncfusion/ej2-dropdowns';
 import { updateSampleSection } from './sample-base';
 function RemoteDataBinding() {
   React.useEffect(() => {
@@ -26,6 +24,46 @@ function RemoteDataBinding() {
     url: 'https://services.odata.org/v4/northwind/northwind.svc/Orders',
   });
   let gridInstance;
+
+  const toolbarOptions = ['Add', 'Edit', 'Delete', 'Update', 'Cancel'];
+  const templateEditLookup = {
+    create: () => {
+      return createElement('input');
+    },
+    read: (args) => {
+      debugger;
+      const dropDownList = getComponent(args.id, 'dropdownlist');
+      return dropDownList.itemData.EmployeeID;
+    },
+    write: async (args) => {
+      debugger;
+      const field = args.column.field;
+      const indice = field.indexOf('.');
+      const NameField = field.substring(indice + 1, field.length);
+      const column = field.substring(0, indice);
+      const value = args.rowData[column];
+
+      const dropDownList = new DropDownList({
+        dataSource: new DataManager({
+          url: `https://services.odata.org/v4/northwind/northwind.svc/Employees?$select=LastName,EmployeeID`,
+          adaptor: new ODataV4Adaptor(),
+        }),
+        fields: { text: NameField },
+        value: value === null ? value : value.LastName,
+      });
+      dropDownList.appendTo(args.element);
+    },
+  };
+
+  const editSettings = {
+    allowEditing: true,
+    allowAdding: true,
+    allowDeleting: true,
+    newRowPosition: 'Top',
+  };
+
+  const pageSettings = { pageCount: 5 };
+
   return (
     <div className="control-pane">
       <div className="control-section">
@@ -34,8 +72,10 @@ function RemoteDataBinding() {
           height={315}
           allowPaging={true}
           columnQueryMode={'ExcludeHidden'}
+          toolbar={toolbarOptions}
+          editSettings={editSettings}
+          pageSettings={pageSettings}
         >
-          <Inject services={[Page]} />
           <ColumnsDirective>
             <ColumnDirective
               field="OrderID"
@@ -43,6 +83,7 @@ function RemoteDataBinding() {
               width="120"
               textAlign="Right"
               visible={true}
+              isPrimaryKey={true}
             />
             <ColumnDirective
               field="ShipName"
@@ -53,6 +94,7 @@ function RemoteDataBinding() {
               field="Employee.LastName"
               headerText="Employee LastName"
               width="150"
+              edit={templateEditLookup}
             />
             <ColumnDirective
               field="Employee.Employee1.LastName"
@@ -66,6 +108,7 @@ function RemoteDataBinding() {
               width="150"
             />
           </ColumnsDirective>
+          <Inject services={[Edit, Toolbar, Page]} />
         </GridComponent>
       </div>
       <div id="waitingpopup" className="waitingpopup">
