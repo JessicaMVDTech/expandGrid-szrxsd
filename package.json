@@ -1,0 +1,23 @@
+{
+  "name": "lgwz7l--run",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "18.1.0",
+    "react-dom": "18.1.0",
+    "@syncfusion/ej2-base": "21.1.38",
+    "@syncfusion/ej2-grids": "21.1.38",
+    "@syncfusion/ej2-react-base": "21.1.38",
+    "@syncfusion/ej2-react-grids": "21.1.38",
+    "@syncfusion/ej2-data": "21.1.38"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "react-scripts": "latest"
+  }
+}
